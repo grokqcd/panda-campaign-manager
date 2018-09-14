@@ -31,15 +31,7 @@ class PandaJobsYAMLParser:
                 print(exc)
         return None
 
-with session_scope(engine) as Session:
-    Base.metadata.create_all(engine)
-    
-    if len(sys.argv) < 3:
-        print(coloured("No campaign specification or list file supplied",'red'))
-        sys.exit(0)
-    else:
-        campSpecFile = sys.argv[1]
-        listFile = sys.argv[2]
+def submitCampaign(Session,campSpecFile,listFile):
 
 
     QUEUE_NAME = 'ANALY_TJLAB_LQCD'
@@ -47,10 +39,6 @@ with session_scope(engine) as Session:
     # read yaml description
 
     jobdef = None
-
-    if len(sys.argv) == 1:
-        print(coloured("No YAML file supplied",'red'))
-        sys.exit(0)
 
     try:
         campdef = PandaJobsYAMLParser.parse(campSpecFile)
@@ -78,12 +66,10 @@ with session_scope(engine) as Session:
 
     with open(listFile,'r') as f:
         for iterable in f:
-            print(iterable)
             jobCommand = re.sub('(<iter>)',iterable,command)
             jobOutput = re.sub('(<iter>)',iterable,outputFile)
             sls = SequentialLQCDSubmitter(aSrvID, QUEUE_NAME, VO)
             job = sls.createJob(walltime=walltime, command=jobCommand, outputFile=jobOutput, nodes=nodes, queuename=queuename, iterable=iterable, campaignID=campaign.id)
             sls.addJob(job.jobName, job) 
-            sls.submit(Session)
-
-    sys.exit(0)
+            print(iterable.strip()+", "+sls.submit(Session)+"\n")
+    return None

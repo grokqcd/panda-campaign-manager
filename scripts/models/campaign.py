@@ -3,8 +3,8 @@ from sqlalchemy import Column, Integer, String, Interval, DateTime, JSON, event,
 from sqlalchemy.orm import relationship, mapper, joinedload
 from sqlalchemy.inspection import inspect
 from sqlalchemy.event import listen
-from alchemybase import Base
-import Client
+from source.alchemybase import Base
+import source.Client as Client
 from job import Job
 #You have to draw the line somewhere.
 from termcolor import colored as coloured
@@ -19,8 +19,8 @@ class Campaign(Base):
     lastUpdate = Column('lastUpdate',DateTime)
 
     def statusReport(self,Session,options=None):
-        printStr = "\n Status Report for Campaign: "+self.name+"\n"
-        printStr += "Last updated: "+str(self.lastUpdate)
+        printStr = "\n Status Report for Campaign: "+coloured(self.name,"yellow")+"\n"
+        printStr += "Last updated: "+str(self.lastUpdate)+"\n"
         printStr += str(len(self.jobs))+" total jobs\n\n"
         for site in Session.query(Job.computingSite, Job.campaignID).filter(Job.campaignID == self.id).group_by(Job.computingSite).all():
             if site[0] and (site[0] != "NULL"):
@@ -50,6 +50,7 @@ class Campaign(Base):
             if j.status not in ["failed", "finished"]:
                 jobs_to_query.append(j.pandaID)
         o = Client.getJobStatus(jobs_to_query)
+        updated = len(jobs_to_query)
         if (o):
             for j in o[1]:
                 try:
@@ -57,7 +58,12 @@ class Campaign(Base):
                     dbJob.updateFromJobSpec(j)
                     Session.commit()
                 except Exception as e:
+                    updated -= 1
                     logging.error(traceback.format_exc())
                     Session.rollback()
             self.lastUpdate = datetime.datetime.now()
-        print(self.statusReport(Session))
+        retStr = str(len(self.jobs) - len(jobs_to_query))+" jobs finished or failed\n"
+        retStr += "Updated "+str(updated)+" in progress jobs\n"
+        if (updated < len(jobs_to_query)):
+            retStr += "Warning: "+str(len(jobs_to_query) - updated)+" jobs failed to update\n" 
+        return retStr

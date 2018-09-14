@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, Interval, DateTime, JSON, event,
 from sqlalchemy.orm import relationship, mapper, joinedload
 from sqlalchemy.inspection import inspect
 from sqlalchemy.event import listen
-from alchemybase import Base
+from source.alchemybase import Base
 
 class Job(Base):
     __tablename__ = 'jobs'

@@ -10,7 +10,6 @@ import time
 import json
 import subprocess
 import random
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),"source"))
 import Client
 from taskbuffer.JobSpec import JobSpec
 from taskbuffer.FileSpec import FileSpec
@@ -89,7 +88,7 @@ class SequentialLQCDSubmitter:
         if self.__debug:
             for i in self.__joblist:
                 print(i.cmtConfig)
-        self.__submit(Session)
+        return self.__submit(Session)
 
     def __submit(self,Session):
         s,o = Client.submitJobs(self.__joblist)
@@ -97,9 +96,9 @@ class SequentialLQCDSubmitter:
             self.dbJob.pandaID = o[0][0]
             self.dbJob.status = 'Submitted'
             self.dbJob.subStatus = 'Submitted'
-            print(o[0][0])
             Session.add(self.dbJob)
             Session.commit()
         except:
            print("Job failed to submit")
            Session.rollback()
+        return str(o[0][0])
