@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 
-#!/usr/bin/env python
-
-# This script is for running LQCD test jobs through PanDA
-#
-
-import argparse, sys
-from source.alchemybase import Base, session_scope, engine
-from source.campaignUpdater import updateCampaign
-from source.campaignStatus import statusCampaign
-from source.campaignSubmitter import submitCampaign
+import argparse, os, sys, logging
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.split(os.path.abspath(__file__))[0],'source')))
+from alchemybase import Base, session_scope, engine
+from campaignUpdater import updateCampaign
+from campaignStatus import statusCampaign
+from campaignSubmitter import submitCampaign
+from campaignDeleter import deleteCampaign
+from campaignResubmitter import resubmitCampaign
 
 with session_scope(engine) as Session:
     Base.metadata.create_all(engine)
+    logging.basicConfig(level=logging.WARNING)
     
     def submitCampaignWrap(args):
+        #We don't just print this after completion - submission can take a while, and so progress is reported incrementally
         submitCampaign(Session,args.template,args.list)
 
     def updateCampaignWrap(args):
@@ -24,7 +24,10 @@ with session_scope(engine) as Session:
         print(statusCampaign(Session,args.CampaignName))
 
     def deleteCampaignWrap(args):
-        pass
+        print(deleteCampaign(Session,args.CampaignName))
+
+    def resubmitCampaignWrap(args):
+        print(resubmitCampaign(Session,args.CampaignName))
 
     parser = argparse.ArgumentParser(description='Campaign submitter and manager for Panda')
     subparser = parser.add_subparsers()
@@ -42,6 +45,10 @@ with session_scope(engine) as Session:
     status.add_argument("CampaignName",help="Campaign to report on")
     status.set_defaults(func=statusCampaignWrap) 
     
+    status = subparser.add_parser("Resubmit", help="Resubmit failed jobs")
+    status.add_argument("CampaignName",help="Campaign to resubmit")
+    status.set_defaults(func=resubmitCampaignWrap) 
+
     delete = subparser.add_parser("Delete", help="Delete a campaign")
     delete.add_argument("CampaignName",help="Campaign to delete")
     delete.set_defaults(func=deleteCampaignWrap) 

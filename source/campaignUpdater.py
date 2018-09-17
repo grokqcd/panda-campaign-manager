@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-
-# This script is for running LQCD test jobs through PanDA
-#
-
 import os, sys, time, json, subprocess, random, re, logging, traceback, yaml
 
 from models.campaign import Campaign

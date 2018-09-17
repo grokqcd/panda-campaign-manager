@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
-# This script is for running LQCD test jobs through PanDA
-#
 
-import logging, traceback
+import os, sys, time, json, subprocess, random, re, logging, traceback, yaml
+
 from models.campaign import Campaign
 #You have to draw the line somewhere.
 from termcolor import colored as coloured
 
-def statusCampaign(Session,campName):
+def deleteCampaign(Session,campName):
 
     try:
         campaign = Session.query(Campaign).filter(Campaign.name.like(campName)).first()
@@ -22,4 +21,10 @@ def statusCampaign(Session,campName):
         Session.rollback()
         sys.exit(1)
 
-    return campaign.statusReport(Session)
+    answer = 'y'
+    #answer = input('Really delete campaign all jobs for '+campaign.name+'?: [y/n]')
+
+    if not answer or answer[0].lower() != 'y':
+        return 'Aborting'
+    else:
+        return campaign.deleteJobs(Session)
