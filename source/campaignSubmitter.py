@@ -19,7 +19,7 @@ def submitCampaign(Session,campSpecFile,listFile):
         campdef = submissionTools.PandaJobsYAMLParser.parse(campSpecFile)
         campaign = Session.query(Campaign).filter(Campaign.name.like(campdef['campaign'])).first()
         if (campaign is None):
-            campaign = Campaign(name=campdef['campaign'],lastUpdate=datetime.datetime.now())
+            campaign = Campaign(name=campdef['campaign'],lastUpdate=datetime.datetime.utcnow())
             Session.add(campaign)
             Session.commit()
     except Exception as e:

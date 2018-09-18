@@ -47,7 +47,7 @@ with session_scope(engine) as Session:
     
     resubmit= subparser.add_parser("Resubmit", help="Resubmit failed jobs")
     resubmit.add_argument("CampaignName",help="Campaign to resubmit")
-    resubmit.add_argument('--resubmit-cancelled', nargs='?', default=False)
+    resubmit.add_argument('--resubmit-cancelled',default=False)
     resubmit.set_defaults(func=resubmitCampaignWrap) 
 
     delete = subparser.add_parser("Delete", help="Delete a campaign")

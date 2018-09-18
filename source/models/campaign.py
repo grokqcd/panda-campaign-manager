@@ -70,7 +70,8 @@ class Campaign(Base):
                     updated -= 1
                     logging.error(traceback.format_exc())
                     Session.rollback()
-            self.lastUpdate = datetime.datetime.now()
+            self.lastUpdate = datetime.datetime.utcnow()
+            Session.commit()
         retStr = str(self.jobs.count() - len(jobs_to_query))+" jobs finished or failed\n"
         retStr += "Updated "+str(updated)+" in progress jobs\n"
         if (updated < len(jobs_to_query)):
