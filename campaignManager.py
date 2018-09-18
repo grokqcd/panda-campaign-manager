@@ -27,7 +27,7 @@ with session_scope(engine) as Session:
         print(deleteCampaign(Session,args.CampaignName))
 
     def resubmitCampaignWrap(args):
-        print(resubmitCampaign(Session,args.CampaignName))
+        print(resubmitCampaign(Session,args.CampaignName,args.resubmit_cancelled))
 
     parser = argparse.ArgumentParser(description='Campaign submitter and manager for Panda')
     subparser = parser.add_subparsers()
@@ -45,9 +45,10 @@ with session_scope(engine) as Session:
     status.add_argument("CampaignName",help="Campaign to report on")
     status.set_defaults(func=statusCampaignWrap) 
     
-    status = subparser.add_parser("Resubmit", help="Resubmit failed jobs")
-    status.add_argument("CampaignName",help="Campaign to resubmit")
-    status.set_defaults(func=resubmitCampaignWrap) 
+    resubmit= subparser.add_parser("Resubmit", help="Resubmit failed jobs")
+    resubmit.add_argument("CampaignName",help="Campaign to resubmit")
+    resubmit.add_argument('--resubmit-cancelled', nargs='?', default=False)
+    resubmit.set_defaults(func=resubmitCampaignWrap) 
 
     delete = subparser.add_parser("Delete", help="Delete a campaign")
     delete.add_argument("CampaignName",help="Campaign to delete")

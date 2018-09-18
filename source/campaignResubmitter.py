@@ -8,7 +8,7 @@ from models.campaign import Campaign
 from termcolor import colored as coloured
 import submissionTools
 
-def resubmitCampaign(Session,campName):
+def resubmitCampaign(Session,campName,resubmit_cancelled):
 
 
     QUEUE_NAME = 'ANALY_TJLAB_LQCD'
@@ -32,8 +32,11 @@ def resubmitCampaign(Session,campName):
 
     aSrvID = None
 
-    print campaign.id
-    for j in campaign.jobs.filter(Job.status.like('failed')):
+    submitStatus = ['failed']
+    submitStatus.append('cancelled') if resubmit_cancelled else submitStatus
+    print submitStatus
+    print resubmit_cancelled
+    for j in campaign.jobs.filter(Job.status.in_(submitStatus)):
         print(j.id, j.status)
         jobSpec = submissionTools.createJobSpec(walltime=j.wallTime, command=j.script, outputFile=j.outputFile, nodes=j.nodes, campaignID=campaign.id)
         j.servername = jobSpec.jobName

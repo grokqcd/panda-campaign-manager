@@ -32,7 +32,7 @@ class Campaign(Base):
                 cS = site[0]
             else:
                 cS = "Not yet allocated to a site"
-            siteCount = str(self.jobs.filter(Job.computingSite.like(site[0])).count())
+            siteCount = str(self.jobs.filter(Job.computingSite.like(site[0])).filter(not_(Job.status.like("cancelled"))).count())
             printStr += cS + ": " + siteCount + "\n"
         cancelled = self.jobs.filter(Job.status.like('cancelled')).count()
         if cancelled > 0:
