@@ -37,27 +37,40 @@ def submitCampaign(Session,campSpecFile,listFile):
         outputFile = campdef['jobtemplate']['outputFile']
     except:
         outputFile = None
-    command = campdef['jobtemplate']['outputFile']
+    command = campdef['jobtemplate']['command']
 
-    with open(listFile,'r') as f:
-        for iterable in f:
-            jobCommand = re.sub('(<iter>)',iterable,command)
-            jobOutput = re.sub('(<iter>)',iterable,outputFile)
-            dbJob = Job(script=command,iterable=iterable,nodes=nodes,wallTime=walltime,status="Submitted",campaignID=campaign.id,outputFile=outputFile)
-            jobSpec = submissionTools.createJobSpec(walltime=walltime, command=jobCommand, outputFile=jobOutput, nodes=nodes, campaignID=campaign.id)
-            dbJob.servername = jobSpec.jobName
-            s,o = Client.submitJobs([jobSpec])
-            try:
-                dbJob.pandaID = o[0][0]
-                dbJob.status = 'submitted'
-                dbJob.subStatus = 'submitted'
-                print(coloured(iterable.strip()+", "+str(o[0][0])+"\n",'green'))
-            except Exception as e:
-                logging.error(traceback.format_exc())
-                print o
-                print(coloured(iterable.strip()+" job failed to submit\n",'red'))
-                dbJob.status = 'failed'
-                dbJob.subStatus = 'failed'
-            Session.add(dbJob)
-            Session.commit()
+    if (listFile):
+        iterList = []
+        with open(listFile,'r') as f:
+            for i in f:
+                iterList.append(i)
+    else:
+        iterList = ['']
+
+    for iterable in iterList:
+        if (listFile):
+            jobCommand = re.sub('<iter>',iterable,command)
+            jobOutput = re.sub('<iter>',iterable,outputFile)
+        else:
+            jobCommand = command
+            jobOutput = outputFile
+        dbJob = Job(script=command,nodes=nodes,wallTime=walltime,status="Submitted",campaignID=campaign.id,outputFile=outputFile)
+        if (listFile):
+            dbJob.iterable = iterable
+        jobSpec = submissionTools.createJobSpec(walltime=walltime, command=jobCommand, outputFile=jobOutput, nodes=nodes, campaignID=campaign.id)
+        dbJob.servername = jobSpec.jobName
+        s,o = Client.submitJobs([jobSpec])
+        try:
+            dbJob.pandaID = o[0][0]
+            dbJob.status = 'submitted'
+            dbJob.subStatus = 'submitted'
+            print(coloured(iterable.strip()+", "+str(o[0][0])+"\n",'green'))
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            print(coloured(iterable.strip()+" job failed to submit\n",'red'))
+            dbJob.status = 'failed'
+            dbJob.subStatus = 'failed'
+        Session.add(dbJob)
+        Session.commit()
+    
     return None

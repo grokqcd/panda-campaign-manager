@@ -32,9 +32,9 @@ with session_scope(engine) as Session:
     parser = argparse.ArgumentParser(description='Campaign submitter and manager for Panda')
     subparser = parser.add_subparsers()
 
-    submit = subparser.add_parser("Submit", help="Submit a list of jobs from a job template and list file.")
+    submit = subparser.add_parser("Submit", help="Submit a list of jobs from a job template.")
     submit.add_argument("template",help="A job template file")
-    submit.add_argument("list",help="A list of iterables")
+    submit.add_argument("list",nargs='?',help="A list iterables to create multiple jobs",default='')
     submit.set_defaults(func=submitCampaignWrap)
 
     update = subparser.add_parser("Update", help="Update the jobs in a campaign from the panda server")

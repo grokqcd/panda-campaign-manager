@@ -3,7 +3,7 @@ jobtemplate:
   nodes: 1
   walltime: "12:00:00"
   queuename: "ANALY_TJLAB_LQCD"
-  outputFile: "/volatile/users/danielt/forDaniel/szscl21_24_256_b1p50_t_x4p300_um0p0856_sm0p0743_n1p265/kpi.3half/000_A1p/szscl21_24_256_b1p50_t_x4p300_um0p0856_sm0p0743_n1p265.out<config>.gz"
+  outputFile: "/volatile/users/danielt/forDaniel/szscl21_24_256_b1p50_t_x4p300_um0p0856_sm0p0743_n1p265/kpi.3half/000_A1p/szscl21_24_256_b1p50_t_x4p300_um0p0856_sm0p0743_n1p265.out<iter>.gz"
   command: |+
     cd /volatile/users/danielt/szscl21_24_256_b1p50_t_x4p300_um0p0856_sm0p0743_n1p265/kpi.3half/000_A1p/
     if ($?SLURM_SUBMIT_HOST != 0) then
@@ -37,7 +37,7 @@ jobtemplate:
       exit 0
     endif
 
-    set newseqno=<config>
+    set newseqno=<iter>
 
     ##set out = ${file_prefix}.out${newseqno}
     set poodoo = "/lustre/volatile/users/danielt/forDaniel/szscl21_24_256_b1p50_t_x4p300_um0p0856_sm0p0743_n1p265/kpi.3half/000_A1p/"
