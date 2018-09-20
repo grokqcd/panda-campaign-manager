@@ -21,10 +21,4 @@ def deleteCampaign(Session,campName):
         Session.rollback()
         sys.exit(1)
 
-    answer = 'y'
-    #answer = input('Really delete campaign all jobs for '+campaign.name+'?: [y/n]')
-
-    if not answer or answer[0].lower() != 'y':
-        return 'Aborting'
-    else:
-        return campaign.deleteJobs(Session)
+    return campaign.deleteJobs(Session)

@@ -19,7 +19,7 @@ class Job(Base):
     campaign = relationship("Campaign", back_populates="jobs")
 
     #Attributes created at submission time
-    serverName = Column('serverName',String)
+    serverName = Column('serverName',String,nullable=True,unique=True)
     nodes = Column('nodes',Integer,default=1)
     wallTime = Column('wallTime',String,default='00:01:00')
     outputFile = Column('outputFile',String,nullable=True)

@@ -1,4 +1,4 @@
-import os, sys, commands, pickle, logging, traceback
+import os, sys, commands, pickle, logging, traceback, json
 from Curl import Curl
 
 
@@ -10,6 +10,10 @@ try:
     baseURLSSL = os.environ['PANDA_URL_SSL']
 except:
     baseURLSSL = 'https://pandawms.org:25443/server/panda'
+try:
+    baseURLMonitor = os.environ['PANDA_URL_MONITOR']
+except:
+    baseURLMonitor = 'http://pandamonitor.org/latest/jobs/?'
 
 # default max size per job
 maxTotalSize = long(14*1024*1024*1024)
@@ -19,6 +23,8 @@ safetySize = long(500*1024*1024)
 
 # limit on maxCpuCount
 maxCpuCountLimit = 1000000000
+
+userName = "Daniel%20Trewartha"
 
 # look for a grid proxy certificate
 def _x509():
@@ -97,3 +103,12 @@ def killJobs(ids,verbose=False):
     except Exception as e:
         logging.error(traceback.format_exc())
         return 1,[]
+
+def getAllJobs():
+    #Get job ids and names from the server to repopulate the database.
+    curl = Curl()
+    curl.verbose=False
+    headers = ['Content-Type: application/json','Accept: application/json']
+    url = '\''+baseURLMonitor+"user=%s\'" % userName
+    output = curl.get(url,{},headers=headers)
+    return output

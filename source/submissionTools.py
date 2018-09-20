@@ -5,7 +5,7 @@ from taskbuffer.FileSpec import FileSpec
 QUEUE_NAME = 'ANALY_TJLAB_LQCD'
 VO = 'Gluex'
 
-def createJobSpec(nodes, walltime, command, campaignID, outputFile=None):
+def createJobSpec(nodes, walltime, command, jobName, outputFile=None):
 
     transformation = '#json#'
     datasetName = 'panda.destDB.%s' % subprocess.check_output('uuidgen')
@@ -15,7 +15,7 @@ def createJobSpec(nodes, walltime, command, campaignID, outputFile=None):
 
     job = JobSpec()
     job.jobDefinitionID   = int(time.time()) % 10000
-    job.jobName           = "%s" % subprocess.check_output('uuidgen')
+    job.jobName           = jobName
     job.VO = VO
     job.transformation = transformation
 

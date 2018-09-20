@@ -8,6 +8,8 @@ from campaignStatus import statusCampaign
 from campaignSubmitter import submitCampaign
 from campaignDeleter import deleteCampaign
 from campaignResubmitter import resubmitCampaign
+from repopulateDatabase import repopulateDatabase
+from termcolor import colored as coloured
 
 with session_scope(engine) as Session:
     Base.metadata.create_all(engine)
@@ -24,10 +26,25 @@ with session_scope(engine) as Session:
         print(statusCampaign(Session,args.CampaignName))
 
     def deleteCampaignWrap(args):
-        print(deleteCampaign(Session,args.CampaignName))
+        answer = raw_input('Really delete campaign all jobs for '+args.CampaignName+'?: [y/n]')
+
+        if not answer or answer[0].lower() != 'y':
+            print 'Aborting'
+        else:
+            print(deleteCampaign(Session,args.CampaignName))
 
     def resubmitCampaignWrap(args):
         print(resubmitCampaign(Session,args.CampaignName,args.resubmit_cancelled))
+
+    def repopulateDatabaseWrap(args):
+        print(coloured("Warning: Repopulating the database from the panda monitor is slow and places a large burden on the server. It should be used with care.",'red'))
+        answer = raw_input('Continue?: [y/n]')
+
+        if not answer or answer[0].lower() != 'y':
+            print 'Aborting'
+        else:
+            pass
+            #print(repopulateDatabase(Session))
 
     parser = argparse.ArgumentParser(description='Campaign submitter and manager for Panda')
     subparser = parser.add_subparsers()
@@ -53,6 +70,9 @@ with session_scope(engine) as Session:
     delete = subparser.add_parser("Delete", help="Delete a campaign")
     delete.add_argument("CampaignName",help="Campaign to delete")
     delete.set_defaults(func=deleteCampaignWrap) 
+
+    repopulate = subparser.add_parser("Repopulate", help="Repopulate the database")
+    repopulate.set_defaults(func=repopulateDatabaseWrap) 
 
     args = parser.parse_args()
     args.func(args)

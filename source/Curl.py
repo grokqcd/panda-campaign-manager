@@ -27,7 +27,7 @@ class Curl:
         self.verbose = False
 
     # GET method
-    def get(self,url,data,rucioAccount=False):
+    def get(self,url,data,headers=None,rucioAccount=False):
         # make command
         com = '%s --silent --get' % self.path
         if not self.verifyHost or not url.startswith('https://'):
@@ -45,6 +45,9 @@ class Curl:
             com += ' --key %s' % self.sslKey
         # max time of 10 min
         com += ' -m 600'
+        if(headers):
+            for h in headers:
+                com += ' -H \'%s\'' % h
         # data
         strData = ''
         for key in data.keys():

@@ -1,4 +1,4 @@
-import os, sys, re, logging, traceback, datetime
+import os, sys, re, logging, traceback, datetime,subprocess
 import Client
 from taskbuffer.JobSpec import JobSpec
 from taskbuffer.FileSpec import FileSpec
@@ -54,11 +54,15 @@ def submitCampaign(Session,campSpecFile,listFile):
         else:
             jobCommand = command
             jobOutput = outputFile
-        dbJob = Job(script=command,nodes=nodes,wallTime=walltime,status="Submitted",campaignID=campaign.id,outputFile=outputFile)
+        dbJob = Job(script=command,nodes=nodes,wallTime=walltime,status="To Submiy",campaignID=campaign.id,outputFile=outputFile)
+        dbJob.servername = campaign.name+subprocess.check_output('uuidgen')
         if (listFile):
             dbJob.iterable = iterable
-        jobSpec = submissionTools.createJobSpec(walltime=walltime, command=jobCommand, outputFile=jobOutput, nodes=nodes, campaignID=campaign.id)
-        dbJob.servername = jobSpec.jobName
+
+        Session.add(dbJob)
+        Session.commit()
+
+        jobSpec = submissionTools.createJobSpec(walltime=walltime, command=jobCommand, outputFile=jobOutput, nodes=nodes, jobName=dbJob.servername)
         s,o = Client.submitJobs([jobSpec])
         try:
             dbJob.pandaID = o[0][0]
@@ -70,7 +74,6 @@ def submitCampaign(Session,campSpecFile,listFile):
             print(coloured(iterable.strip()+" job failed to submit\n",'red'))
             dbJob.status = 'failed'
             dbJob.subStatus = 'failed'
-        Session.add(dbJob)
         Session.commit()
     
     return None
