@@ -54,7 +54,7 @@ def submitCampaign(Session,campSpecFile,listFile):
         else:
             jobCommand = command
             jobOutput = outputFile
-        dbJob = Job(script=command,nodes=nodes,wallTime=walltime,status="To Submit",campaignID=campaign.id,outputFile=outputFile)
+        dbJob = Job(script=jobCommand,nodes=nodes,wallTime=walltime,status="To Submit",campaignID=campaign.id,outputFile=jobOutput)
         dbJob.servername = campaign.name+subprocess.check_output('uuidgen')
         if (listFile):
             dbJob.iterable = iterable

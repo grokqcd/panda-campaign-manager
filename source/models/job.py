@@ -22,7 +22,7 @@ class Job(Base):
     serverName = Column('serverName',String,nullable=True,unique=True)
     nodes = Column('nodes',Integer,default=1)
     wallTime = Column('wallTime',String,default='00:01:00')
-    outputFile = Column('outputFile',String,nullable=True)
+    outputFile = Column('outputFile',String,nullable=True,unique=True)
     script = Column('script',String, nullable=False)
 
     #Attributes that will be updated from the panda server
