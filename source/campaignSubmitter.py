@@ -1,4 +1,4 @@
-import os, sys, re, logging, traceback, datetime,subprocess
+import os, sys, re, logging, traceback, datetime,subprocess, json
 import Client
 from taskbuffer.JobSpec import JobSpec
 from taskbuffer.FileSpec import FileSpec
@@ -16,7 +16,7 @@ def submitCampaign(Session,campSpecFile,listFile):
     jobdef = None
 
     try:
-        campdef = submissionTools.PandaJobsYAMLParser.parse(campSpecFile)
+        campdef = submissionTools.PandaJobsJSONParser.parse(campSpecFile)
         campaign = Session.query(Campaign).filter(Campaign.name.like(campdef['campaign'])).first()
         if (campaign is None):
             campaign = Campaign(name=campdef['campaign'],lastUpdate=datetime.datetime.utcnow())
@@ -54,7 +54,7 @@ def submitCampaign(Session,campSpecFile,listFile):
         else:
             jobCommand = command
             jobOutput = outputFile
-        dbJob = Job(script=command,nodes=nodes,wallTime=walltime,status="To Submiy",campaignID=campaign.id,outputFile=outputFile)
+        dbJob = Job(script=command,nodes=nodes,wallTime=walltime,status="To Submit",campaignID=campaign.id,outputFile=outputFile)
         dbJob.servername = campaign.name+subprocess.check_output('uuidgen')
         if (listFile):
             dbJob.iterable = iterable

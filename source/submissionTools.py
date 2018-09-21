@@ -1,4 +1,4 @@
-import os, sys, json, yaml, subprocess, time
+import os, sys, json, subprocess, time, traceback, logging
 from taskbuffer.JobSpec import JobSpec
 from taskbuffer.FileSpec import FileSpec
 
@@ -50,7 +50,7 @@ def createJobSpec(nodes, walltime, command, jobName, outputFile=None):
     return job
 
 
-class PandaJobsYAMLParser:
+class PandaJobsJSONParser:
     def __init__(self):
         pass
 
@@ -60,8 +60,9 @@ class PandaJobsYAMLParser:
             raise OSError("filename is empty")
         with open(filename, "r") as stream:
             try:
-                return yaml.load(stream)
-            except yaml.YAMLError as exc:
-                print(exc)
+                return json.load(stream)
+            except Exception as e:
+                logging.error(traceback.format_exc())
+                sys.exit(1)
         return None
 
